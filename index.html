@@ -119,7 +119,7 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 // Active authentication token detected. Pass straight through to index.
-                window.location.href = "index.html";
+                window.location.href = "form.html";
             } else {
                 // No current token. Drop loader screen and cleanly map the inputs into layout view.
                 authLoader.style.display = 'none';
