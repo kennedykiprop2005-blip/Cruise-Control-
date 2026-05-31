@@ -16,17 +16,40 @@
             font-family: 'Segoe UI', sans-serif; 
             background-color: var(--background-color); 
             margin: 0; 
-            padding-bottom: 40px; 
+            padding-bottom: 20px; 
         }
 
-        /* --- UNIFIED HEADER & NAV STYLES --- */
+        /* --- LOGIN SECTION STYLES --- */
+        #loginSection {
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh;
+        }
+        .login-box { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 350px; 
+        }
+        .login-box h2 { text-align: center; color: var(--primary-color); margin-top: 0; }
+        .login-btn { 
+            background-color: var(--primary-color); 
+            color: white; border: none; padding: 12px; width: 100%; 
+            border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px;
+        }
+        .error-msg { color: #d32f2f; text-align: center; font-size: 0.85rem; margin-top: 10px; min-height: 20px;}
+
+        /* --- MAIN APP SECTION STYLES --- */
         header { 
             text-align: center; padding: 20px 20px 15px 20px; 
             background: #ffffff; border-bottom: 3px solid var(--primary-color); 
-            margin-bottom: 25px; border-radius: 0 0 15px 15px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 10px; border-radius: 0 0 15px 15px; 
         }
 
+        /* --- NAVIGATION STYLES --- */
         .top-nav {
             margin: 15px 0;
         }
@@ -37,7 +60,7 @@
             display: flex;
             justify-content: center;
             gap: 10px;
-            flex-wrap: wrap;
+            flex-wrap: wrap; /* Allows wrapping on small mobile screens */
         }
         .top-nav a {
             text-decoration: none;
@@ -60,28 +83,43 @@
             padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer;
             margin-top: 5px; font-size: 0.8rem;
         }
-
-        /* --- MAIN FORM CONTAINER --- */
         .container { 
             max-width: 600px; margin: 0 auto; background: white; 
-            padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
         }
-        .container h2 { text-align: center; color: var(--primary-color); margin-top: 5px; margin-bottom: 25px; }
-        .form-section { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-        .form-section h3 { color: #555; font-size: 1.1rem; margin-top: 0; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .form-group { margin-bottom: 12px; }
-        label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 5px; color: #333; }
-        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
-        input[readonly] { background-color: #f8f9fa; color: #6c757d; font-weight: bold; }
+        .container h2 { text-align: center; color: var(--primary-color); margin-top: 5px; }
+        .form-section { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .form-group { margin-bottom: 10px; }
+        label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 3px; }
+        input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        input[readonly] { background-color: #f8f9fa; }
         .submit-btn { 
             background-color: var(--primary-color); color: white; border: none; 
-            padding: 14px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1rem;
-            transition: opacity 0.2s;
+            padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; 
         }
-        .submit-btn:hover { opacity: 0.9; }
     </style>
 </head>
 <body>
+
+    <div id="loginSection">
+        <div class="login-box">
+            <h2>CRUISE CONTROL</h2>
+            <p style="text-align: center; margin-top: -15px; margin-bottom: 25px; font-size: 14px; color: #666;">Authorized Personnel Only</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" required placeholder="admin@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="login-btn" id="loginBtn">Log In</button>
+                <div id="errorMsg" class="error-msg"></div>
+            </form>
+        </div>
+    </div>
 
     <div id="mainAppSection" style="display: none;">
         <header>
@@ -94,7 +132,7 @@
 
             <nav class="top-nav">
                 <ul>
-                    <li><a href="form.html" class="active">Home</a></li>
+                    <li><a href="index.html" class="active">Home</a></li>
                     <li><a href="dashboard.html">Dashboard</a></li>
                     <li><a href="Records1.html">Records</a></li>
                     <li><a href="report.html">Report</a></li>
@@ -105,7 +143,7 @@
         </header>
 
         <div class="container">
-            <h2>New Rental Log Entry</h2>
+            <h2>New Rental Log</h2>
             
             <form id="rentalForm">
                 <div class="form-section">
@@ -123,15 +161,15 @@
                     <div class="form-group"><label for="currentMileage">Current Mileage (km)</label><input type="number" id="currentMileage" required placeholder="e.g., 85000"></div>
                 </div>
 
-                <div class="form-section" style="border-bottom: none; margin-bottom: 10px;">
+                <div class="form-section" style="border-bottom: none;">
                     <h3>3. Rental & Financial Details</h3>
                     <div class="form-group"><label for="dateTaken">Date Taken</label><input type="date" id="dateTaken" required></div>
                     <div class="form-group"><label for="timeTaken">Time Taken</label><input type="time" id="timeTaken" required></div>
                     <div class="form-group"><label for="daysTaken">Days Taken</label><input type="number" id="daysTaken" required min="1" placeholder="How many days?"></div>
                     <div class="form-group"><label for="returnDate">Expected Return Date</label><input type="date" id="returnDate" readonly></div>
-                    <div class="form-group"><label for="ratePerDay">Rate Per Day (KES)</label><input type="number" id="ratePerDay" required placeholder="Amount per day"></div>
-                    <div class="form-group"><label for="amountPaid">Amount Paid (KES)</label><input type="number" id="amountPaid" required placeholder="Total initial payment"></div>
-                    <div class="form-group"><label for="arrearsRemaining">Arrears Remaining (Auto-Calculated)</label><input type="number" id="arrearsRemaining" readonly placeholder="Auto-calculated balance"></div>
+                    <div class="form-group"><label for="ratePerDay">Rate Per Day</label><input type="number" id="ratePerDay" required placeholder="Amount per day"></div>
+                    <div class="form-group"><label for="amountPaid">Amount Paid</label><input type="number" id="amountPaid" required placeholder="Total initial payment"></div>
+                    <div class="form-group"><label for="arrearsRemaining">Arrears Remaining (Calculated)</label><input type="number" id="arrearsRemaining" readonly placeholder="Auto-calculated"></div>
                 </div>
 
                 <button type="submit" class="submit-btn">Save Rental Record</button>
@@ -140,10 +178,12 @@
     </div>
 
     <script type="module">
+        // 1. Combine Imports for both Auth and Firestore
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+        // 2. Firebase Configuration
         const firebaseConfig = {
           apiKey: "AIzaSyBTYM84E6TSy0Q2QUZSt9MCYn6uAiZ6HpI",
           authDomain: "site-bcb4b.firebaseapp.com",
@@ -154,28 +194,59 @@
           measurementId: "G-2RFQQQ2EPP"
         };
 
+        // 3. Initialize Firebase, Auth, and Firestore
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // UI Sections
+        const loginSection = document.getElementById('loginSection');
         const mainAppSection = document.getElementById('mainAppSection');
 
-        // Security Authentication Route Controller Gate
+        // =========================================
+        // AUTHENTICATION LOGIC (The Gatekeeper)
+        // =========================================
+        
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Verified session token active. Reveal form layout seamlessly.
+                loginSection.style.display = 'none';
                 mainAppSection.style.display = 'block';
             } else {
-                // No token detected. Instantly bounce visitor out to main index.html file
-                window.location.href = "index.html";
+                loginSection.style.display = 'flex';
+                mainAppSection.style.display = 'none';
             }
         });
 
-        // Handle the Logout Button Routing
+        // Handle the Login Button
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMsg = document.getElementById('errorMsg');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginBtn.textContent = "Verifying...";
+            loginBtn.disabled = true;
+            errorMsg.textContent = "";
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                console.error("Login Failed:", error.message);
+                errorMsg.textContent = "Invalid email or password.";
+            } finally {
+                loginBtn.textContent = "Log In";
+                loginBtn.disabled = false;
+            }
+        });
+
+        // Handle the Logout Button
         const logoutBtn = document.getElementById('logoutBtn');
         logoutBtn.addEventListener('click', () => {
             signOut(auth).then(() => {
-                window.location.href = "index.html";
+                console.log("Logged out successfully");
             }).catch((error) => {
                 console.error("Logout Error:", error);
             });
@@ -243,7 +314,6 @@
                     ratePerDay: Number(document.getElementById('ratePerDay').value),
                     amountPaid: Number(document.getElementById('amountPaid').value),
                     arrearsRemaining: Number(document.getElementById('arrearsRemaining').value),
-                    status: "Active", // Base fallback tracking descriptor status hook
                     createdAt: new Date().toISOString()
                 };
 
@@ -251,12 +321,10 @@
 
                 alert("Rental record saved successfully to Firebase!");
                 rentalForm.reset();
-                returnDateInput.value = '';
-                arrearsRemainingInput.value = '';
                 
             } catch (error) {
                 console.error("Error adding document: ", error);
-                alert("Error saving record. Check database rules.");
+                alert("Error saving record. Make sure your Firestore database is in 'Test Mode'.");
             } finally {
                 submitBtn.textContent = "Save Rental Record";
                 submitBtn.disabled = false;
