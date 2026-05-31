@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rental Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f4f7f6; }
+        .record-card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        
+        /* Navigation Styles */
+        nav ul { list-style-type: none; padding: 0; margin: 0; display: flex; justify-content: center; gap: 20px; background-color: #f4f4f4; padding: 10px; border-radius: 8px; }
+        nav a { text-decoration: none; color: #333; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="Records1.html">Records</a></li>
+            <li><a href="report.html">Report</a></li>
+            <li><a href="status.html">Status</a></li>
+        </ul>
+    </nav>
+
+    <h2>Active Rentals</h2>
+    <div id="allRecordsList">Loading records...</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyBTYM84E6TSy0Q2QUZSt9MCYn6uAiZ6HpI",
+          authDomain: "site-bcb4b.firebaseapp.com",
+          projectId: "site-bcb4b",
+          storageBucket: "site-bcb4b.firebasestorage.app",
+          messagingSenderId: "586333698174",
+          appId: "1:586333698174:web:cae8db0888c460047d802f",
+          measurementId: "G-2RFQQQ2EPP"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadDashboard() {
+            const list = document.getElementById('allRecordsList');
+            try {
+                const querySnapshot = await getDocs(collection(db, "rentals"));
+                list.innerHTML = '';
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const returnDate = new Date(data.expectedReturnDate);
+                    const today = new Date();
+                    const diffTime = returnDate - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    let statusText = (diffDays < 0) ? `Overdue by ${Math.abs(diffDays)} days` : 
+                                     (diffDays === 0) ? "Due today!" : `${diffDays} days remaining`;
+                    let borderColor = (diffDays < 0) ? "#d32f2f" : (diffDays === 0) ? "#f57c00" : "#388e3c";
+
+                    const div = document.createElement('div');
+                    div.className = 'record-card';
+                    div.style.borderLeft = `5px solid ${borderColor}`;
+                    div.innerHTML = `
+                        <strong>Client: ${data.clientName}</strong><br>
+                        Car: ${data.carModel} (${data.numberPlate})<br>
+                        <strong style="color: ${borderColor};">${statusText}</strong><br>
+                        <small>Due: ${data.expectedReturnDate}</small>
+                    `;
+                    list.appendChild(div);
+                });
+            } catch (error) {
+                list.innerHTML = "Error loading data. Check console.";
+                console.error(error);
+            }
+        }
+        loadDashboard();
+    </script>
+</body>
+</html>
