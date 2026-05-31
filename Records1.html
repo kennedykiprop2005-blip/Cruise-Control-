@@ -2,66 +2,182 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>All Rental Records</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cruise Control | Records</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f4f7f6; }
-        .record-card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid #0056b3; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .nav { text-align: center; margin-bottom: 20px; }
-    </style>
-</head>
-<body>
-  
-<html>
-<head>
-    <style>
-        /* This CSS makes the navigation horizontal */
-        nav ul {
-            list-style-type: none;
-            padding: 10px;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            background-color: #f4f4f4;
-            border-bottom: 2px solid #ddd;
+        :root {
+            --primary-color: #0056b3;
+            --secondary-color: #d32f2f;
+            --background-color: #f4f7f6;
+            --warning-color: #ffc107;
+            --success-color: #28a745;
         }
-        nav a {
-            text-decoration: none;
-            color: #0056b3;
+        
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: var(--background-color); 
+            margin: 0; 
+            padding-bottom: 20px; 
+        }
+
+        /* --- HEADER & NAV STYLES --- */
+        header { 
+            text-align: center; padding: 20px 20px 15px 20px; 
+            background: #ffffff; border-bottom: 3px solid var(--primary-color); 
+            margin-bottom: 20px; border-radius: 0 0 15px 15px; 
+        }
+        .top-nav { margin: 15px 0; }
+        .top-nav ul {
+            list-style: none; padding: 0; margin: 0; 
+            display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+        }
+        .top-nav a {
+            text-decoration: none; color: var(--primary-color); 
+            background-color: #e9f0f8; padding: 8px 16px; 
+            border-radius: 5px; font-weight: 600; font-size: 0.9rem; 
+            transition: all 0.3s ease;
+        }
+        .top-nav a:hover, .top-nav a.active {
+            background-color: var(--primary-color); color: white;
+        }
+        .logout-btn {
+            background-color: var(--secondary-color); color: white; border: none;
+            padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer;
+            margin-top: 5px; font-size: 0.8rem;
+        }
+
+        /* --- TABLE & CONTAINER STYLES --- */
+        .container { 
+            max-width: 1300px; margin: 0 auto; background: white; 
+            padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }
+        .container h2 { text-align: center; color: var(--primary-color); margin-top: 5px; margin-bottom: 20px; }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        th, td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Status Badges */
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
             font-weight: bold;
-            font-family: sans-serif;
+            font-size: 0.8rem;
+            display: inline-block;
+            text-align: center;
+        }
+        .badge.clear { background-color: #e2f0d9; color: #385723; }
+        .badge.arrears { background-color: #fce4d6; color: var(--secondary-color); }
+        
+        /* Trip Status Badges */
+        .badge.completed { background-color: #d1ecf1; color: #0c5460; }
+        .badge.ongoing { background-color: #e8f5e9; color: var(--success-color); }
+        .badge.overdue { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        
+        /* Action Button */
+        .action-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .action-btn:hover {
+            background-color: #5a6268;
+        }
+        
+        .loading-text {
+            text-align: center;
+            font-weight: bold;
+            color: #666;
+            padding: 20px;
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="Records1.html">Records</a></li>
-            <li><a href="report.html">Report</a></li>
-            <li><a href="status.html">Status</a></li>
-        </ul>
-    </nav>
+    <div id="mainAppSection" style="display: none;">
+        <header>
+            <h1 style="margin: 0; color: var(--primary-color); font-size: 28px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;">
+                CRUISE CONTROL
+            </h1>
+            <p style="margin: 5px 0 0 0; color: var(--secondary-color); font-weight: bold; font-size: 18px; letter-spacing: 0.5px;">
+                Rentals & Logistics
+            </p>
 
-    </body>
-</html>
+            <nav class="top-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="Records.html" class="active">Records</a></li>
+                    <li><a href="report.html">Report</a></li>
+                </ul>
+            </nav>
 
-    <header style="text-align: center; padding: 20px; background: #ffffff; border-bottom: 3px solid #0056b3; margin-bottom: 20px;">
-        <h1 style="color: #0056b3;">CRUISE CONTROL</h1>
-        <p style="color: #d32f2f; font-weight: bold;">System Audit Trail</p>
-    </header>
+            <button id="logoutBtn" class="logout-btn">Log Out</button>
+        </header>
 
-    <div class="nav">
-        <a href="dashboard.html">← Back to Dashboard</a>
+        <div class="container">
+            <h2>Entire Rental Records Log</h2>
+            
+            <div class="table-responsive">
+                <div id="loading" class="loading-text">Loading database logs...</div>
+                <table id="recordsTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Client Name</th>
+                            <th>Phone</th>
+                            <th>Vehicle Model</th>
+                            <th>Plate</th>
+                            <th>Date Taken</th>
+                            <th>Days</th>
+                            <th>Return Date</th>
+                            <th>Trip Status</th>
+                            <th>Rate/Day</th>
+                            <th>Paid</th>
+                            <th>Arrears</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-
-    <div id="allRecordsList">Loading all archives...</div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBTYM84E6TSy0Q2QUZSt9MCYn6uAiZ6HpI",
@@ -72,38 +188,139 @@
           appId: "1:586333698174:web:cae8db0888c460047d802f",
           measurementId: "G-2RFQQQ2EPP"
         };
-        
+
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
 
-        async function loadAllRecords() {
+        const mainAppSection = document.getElementById('mainAppSection');
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                mainAppSection.style.display = 'block';
+                fetchRecords();
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = "login.html";
+            }).catch((error) => console.error("Logout Error:", error));
+        });
+
+        async function fetchRecords() {
+            const tableBody = document.getElementById('tableBody');
+            const loadingText = document.getElementById('loading');
+            const recordsTable = document.getElementById('recordsTable');
+
             try {
-                // Sorting query: newest records first based on 'dateTaken'
-                const q = query(collection(db, "rentals"), orderBy("dateTaken", "desc"));
+                // Fetch ordered by createdAt desc to handle "new data first" structure
+                const q = query(collection(db, "rentals"), orderBy("createdAt", "desc"));
                 const querySnapshot = await getDocs(q);
                 
-                const list = document.getElementById('allRecordsList');
-                list.innerHTML = '';
+                tableBody.innerHTML = "";
                 
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const div = document.createElement('div');
-                    div.className = 'record-card';
-                    div.innerHTML = `
-                        <strong>Client: ${data.clientName}</strong> | Status: ${data.status}<br>
-                        Car: ${data.carModel} (${data.numberPlate})<br>
-                        Started: ${data.dateTaken} | Due: ${data.expectedReturnDate}<br>
-                        Total Days: ${data.daysTaken} | Rate: KES ${data.ratePerDay}<br>
-                        <strong>Paid: KES ${data.amountPaid} | Balance: KES ${data.arrearsRemaining}</strong>
-                    `;
-                    list.appendChild(div);
+                if (querySnapshot.empty) {
+                    loadingText.textContent = "No rental records found in the system.";
+                    return;
+                }
+
+                const todayStr = new Date().toISOString().split('T')[0];
+                
+                let activeRecords = [];
+                let completedRecords = [];
+
+                // Separate active logs from completed logs while preserving date structure
+                querySnapshot.forEach((documentSnapshot) => {
+                    const data = documentSnapshot.data();
+                    const docId = documentSnapshot.id;
+                    
+                    if (data.status === 'Completed') {
+                        completedRecords.push({ id: docId, data: data });
+                    } else {
+                        activeRecords.push({ id: docId, data: data });
+                    }
                 });
+
+                // Recombine arrays to place Active elements directly at the apex
+                const sortedRecords = [...activeRecords, ...completedRecords];
+
+                sortedRecords.forEach((item) => {
+                    const data = item.data;
+                    const docId = item.id;
+                    const row = document.createElement('tr');
+
+                    // 1. Financial Status
+                    const arrearsValue = Number(data.arrearsRemaining) || 0;
+                    const financialBadge = arrearsValue <= 0 
+                        ? `<span class="badge clear">Cleared</span>` 
+                        : `<span class="badge arrears">KES ${arrearsValue.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>`;
+
+                    // 2. Operational Trip Status
+                    let statusBadge = '';
+                    let actionButtonHTML = '';
+
+                    if (data.status === 'Completed') {
+                        statusBadge = `<span class="badge completed">Completed</span>`;
+                        actionButtonHTML = `<span style="color:#888; font-size:0.8rem;">Returned</span>`;
+                    } else {
+                        if (data.expectedReturnDate && data.expectedReturnDate < todayStr) {
+                            statusBadge = `<span class="badge overdue">Overdue</span>`;
+                        } else {
+                            statusBadge = `<span class="badge ongoing">Ongoing</span>`;
+                        }
+                        actionButtonHTML = `<button class="action-btn" data-id="${docId}">Complete Trip</button>`;
+                    }
+
+                    row.innerHTML = `
+                        <td><strong>${data.clientName || 'N/A'}</strong></td>
+                        <td>${data.clientPhone || 'N/A'}</td>
+                        <td>${data.carModel || 'N/A'} (${data.carColor || ''})</td>
+                        <td><span style="background: #eee; padding: 2px 6px; border-radius:3px; font-weight:bold;">${data.numberPlate || 'N/A'}</span></td>
+                        <td>${data.dateTaken || 'N/A'}</td>
+                        <td>${data.daysTaken || '0'} Days</td>
+                        <td>${data.expectedReturnDate || 'N/A'}</td>
+                        <td>${statusBadge}</td>
+                        <td>${Number(data.ratePerDay).toLocaleString()}</td>
+                        <td>${Number(data.amountPaid).toLocaleString()}</td>
+                        <td>${financialBadge}</td>
+                        <td>${actionButtonHTML}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                // Event listener assignment for real-time state modification buttons
+                document.querySelectorAll('.action-btn').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        if (confirm("Mark this vehicle as returned to yard?")) {
+                            e.target.textContent = "Updating...";
+                            e.target.disabled = true;
+                            try {
+                                const rentalRef = doc(db, "rentals", id);
+                                await updateDoc(rentalRef, { status: 'Completed' });
+                                fetchRecords(); 
+                            } catch (err) {
+                                console.error("Error updating status:", err);
+                                alert("Failed to update status.");
+                                e.target.textContent = "Complete Trip";
+                                e.target.disabled = false;
+                            }
+                        }
+                    });
+                });
+
+                loadingText.style.display = 'none';
+                recordsTable.style.display = 'table';
+
             } catch (error) {
-                console.error("Error loading records:", error);
-                document.getElementById('allRecordsList').innerHTML = "Error loading records. Check console for details.";
+                console.error("Error loading records: ", error);
+                loadingText.textContent = "Error fetching records.";
+                loadingText.style.color = "var(--secondary-color)";
             }
         }
-        loadAllRecords();
     </script>
 </body>
 </html>
