@@ -3,56 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rental Dashboard</title>
+    <title>Cruise Control | Dashboard</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f4f7f6; }
-        .card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 5px solid #ccc; }
-        .urgent { border-left: 5px solid red; background: #fff0f0; }
-        button { background: #0056b3; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 5px;}
-        .extend-btn { background: #28a745 !important; }
-        .complete-btn { background: #6c757d !important; }
-        .nav { text-align: center; margin-bottom: 20px; }
+        :root {
+            --primary-color: #0056b3;
+            --secondary-color: #d32f2f;
+            --background-color: #f4f7f6;
+            --warning-color: #ffc107;
+            --success-color: #28a745;
+        }
+        
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: var(--background-color); 
+            margin: 0; 
+            padding-bottom: 40px; 
+        }
+
+        /* --- UNIFIED HEADER & NAV STYLES --- */
+        header { 
+            text-align: center; padding: 20px 20px 15px 20px; 
+            background: #ffffff; border-bottom: 3px solid var(--primary-color); 
+            margin-bottom: 25px; border-radius: 0 0 15px 15px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .top-nav { margin: 15px 0; }
+        .top-nav ul {
+            list-style: none; padding: 0; margin: 0; 
+            display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+        }
+        .top-nav a {
+            text-decoration: none; color: var(--primary-color); 
+            background-color: #e9f0f8; padding: 8px 16px; 
+            border-radius: 5px; font-weight: 600; font-size: 0.9rem; 
+            transition: all 0.3s ease;
+        }
+        .top-nav a:hover, .top-nav a.active {
+            background-color: var(--primary-color); color: white;
+        }
+        .logout-btn {
+            background-color: var(--secondary-color); color: white; border: none;
+            padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer;
+            margin-top: 5px; font-size: 0.8rem;
+        }
+
+        /* --- DASHBOARD CONTAINER & CARD STYLES --- */
+        .container { 
+            max-width: 800px; margin: 0 auto; padding: 0 20px;
+        }
+        .container h2 { 
+            text-align: center; color: var(--primary-color); margin-top: 5px; margin-bottom: 20px; 
+        }
+        
+        #rentalList {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .card { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+            border-left: 6px solid #ccc; 
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        .card.urgent { 
+            border-left: 6px solid var(--secondary-color); 
+            background: #fff5f5; 
+        }
+
+        /* --- UNIFIED CARD BUTTONS --- */
+        .btn-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        button { 
+            background-color: var(--primary-color); 
+            color: white; 
+            border: none; 
+            padding: 10px 14px; 
+            border-radius: 5px; 
+            font-weight: bold;
+            cursor: pointer; 
+            font-size: 0.85rem;
+            transition: opacity 0.2s;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .extend-btn { background-color: var(--success-color) !important; }
+        .complete-btn { background-color: #6c757d !important; }
+        .delete-btn { background-color: var(--secondary-color) !important; }
+
+        .loading-text {
+            text-align: center;
+            font-weight: bold;
+            color: #666;
+            padding: 30px;
+        }
+        
+        .plate-badge {
+            background: #eee; 
+            padding: 2px 6px; 
+            border-radius: 3px; 
+            font-weight: bold;
+            display: inline-block;
+            margin-left: 4px;
+        }
+        .arrears-text {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+        .cleared-text {
+            color: var(--success-color);
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-  <head>
-  <style>
-    nav ul {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-      display: flex; /* This makes the list horizontal */
-      justify-content: center; /* This centers the links */
-      gap: 20px; /* This adds space between the links */
-      background-color: #f4f4f4;
-      padding: 10px;
-    }
-    nav a {
-      text-decoration: none;
-      color: #333;
-      font-weight: bold;
-    }
-  </style>
-</head>
 
-  <nav>
-  <ul>
-    <li><a href="index.html">Home</a></li>
-    <li><a href="dashboard.html">Dashboard</a></li>
-    <li><a href="Records1.html">Records</a></li>
-    <li><a href="report.html">Report</a></li>
-  </ul>
-</nav>
+    <div id="mainAppSection" style="display: none;">
+        <header>
+            <h1 style="margin: 0; color: var(--primary-color); font-size: 28px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;">
+                CRUISE CONTROL
+            </h1>
+            <p style="margin: 5px 0 0 0; color: var(--secondary-color); font-weight: bold; font-size: 18px; letter-spacing: 0.5px;">
+                Rentals & Logistics
+            </p>
 
-    <div class="nav">
-        <a href="index.html" style="text-decoration: none; color: #0056b3; font-weight: bold;">← Add New Rental</a>
+            <nav class="top-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                    <li><a href="Records1.html">Records</a></li>
+                    <li><a href="report.html">Report</a></li>
+                </ul>
+            </nav>
+
+            <button id="logoutBtn" class="logout-btn">Log Out</button>
+        </header>
+
+        <div class="container">
+            <h2>Active Tracking Matrix</h2>
+            <div id="rentalList" class="loading-text">Loading database deployment records...</div>
+        </div>
     </div>
-    <h2>Active Rentals</h2>
-    <div id="rentalList">Loading records...</div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, updateDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBTYM84E6TSy0Q2QUZSt9MCYn6uAiZ6HpI",
@@ -65,57 +173,105 @@
         };
         
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
 
+        const mainAppSection = document.getElementById('mainAppSection');
+
+        // Security Authentication Router Verification Gate
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                mainAppSection.style.display = 'block';
+                loadRentals();
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = "login.html";
+            }).catch((error) => console.error("Logout Error:", error));
+        });
+
         async function loadRentals() {
-            const querySnapshot = await getDocs(collection(db, "rentals"));
             const list = document.getElementById('rentalList');
-            list.innerHTML = '';
-            
-            const today = new Date();
-            today.setHours(0,0,0,0);
-
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
+            try {
+                // Fetching elements ordered by newest input dates first
+                const q = query(collection(db, "rentals"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
                 
-                // Only show if status is not 'Completed'
-                if (data.status === 'Completed') return;
+                list.innerHTML = '';
+                
+                let activeCount = 0;
+                const today = new Date();
+                today.setHours(0,0,0,0);
 
-                const returnDate = new Date(data.expectedReturnDate);
-                const timeDiff = returnDate - today;
-                const daysUntilReturn = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-                const isUrgent = daysUntilReturn <= 1;
+                querySnapshot.forEach((documentSnapshot) => {
+                    const data = documentSnapshot.data();
+                    const docId = documentSnapshot.id;
+                    
+                    // Filter out finished entries completely from the active board view
+                    if (data.status === 'Completed') return;
+                    activeCount++;
 
-                const div = document.createElement('div');
-                div.className = isUrgent ? 'card urgent' : 'card';
-                div.innerHTML = `
-                    <strong>${data.clientName}</strong><br>
-                    Car: ${data.carModel} | Plate: ${data.numberPlate}<br>
-                    <strong>Arrears: KES ${data.arrearsRemaining}</strong><br>
-                    ${isUrgent ? `<div style="color: red; font-weight: bold;">⚠️ Due in ${daysUntilReturn <= 0 ? '0' : '1'} day(s)</div>` : ''}
-                    <button onclick="addPayment('${doc.id}', ${data.arrearsRemaining}, ${data.amountPaid})">Record Payment</button>
-                    <button class="extend-btn" onclick="extendRental('${doc.id}', ${data.daysTaken}, ${data.ratePerDay}, ${data.arrearsRemaining}, '${data.dateTaken}')">Extend Rental</button>
-                    <button class="complete-btn" onclick="closeRental('${doc.id}', ${data.arrearsRemaining})">Mark Completed</button>
-                `;
-                list.appendChild(div);
-            });
+                    const returnDate = new Date(data.expectedReturnDate);
+                    const timeDiff = returnDate - today;
+                    const daysUntilReturn = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                    const isUrgent = daysUntilReturn <= 1;
+
+                    const arrearsVal = Number(data.arrearsRemaining) || 0;
+                    const financialString = arrearsVal <= 0 
+                        ? `<span class="cleared-text">Cleared</span>` 
+                        : `<span class="arrears-text">KES ${arrearsVal.toLocaleString()}</span>`;
+
+                    const div = document.createElement('div');
+                    div.className = isUrgent ? 'card urgent' : 'card';
+                    div.innerHTML = `
+                        <div style="font-size: 1.1rem; margin-bottom: 5px;"><strong>${data.clientName || 'N/A'}</strong></div>
+                        <div style="color: #555; font-size: 0.95rem; line-height: 1.5;">
+                            Vehicle Model: <strong>${data.carModel || 'N/A'}</strong> | Plate: <span class="plate-badge">${data.numberPlate || 'N/A'}</span><br>
+                            Arrears Balance: ${financialString}<br>
+                            Expected Return: <strong>${data.expectedReturnDate || 'N/A'}</strong>
+                        </div>
+                        ${isUrgent ? `<div style="color: var(--secondary-color); font-weight: bold; margin-top: 8px; font-size: 0.9rem;">⚠️ Due Imminently: Less than 24 hours remaining!</div>` : ''}
+                        
+                        <div class="btn-group">
+                            <button onclick="addPayment('${docId}', ${arrearsVal}, ${Number(data.amountPaid || 0)})">Record Payment</button>
+                            <button class="extend-btn" onclick="extendRental('${docId}', ${Number(data.daysTaken || 0)}, ${Number(data.ratePerDay || 0)}, ${arrearsVal}, '${data.dateTaken}')">Extend Trip</button>
+                            <button class="complete-btn" onclick="closeRental('${docId}', ${arrearsVal})">Complete</button>
+                            <button class="delete-btn" onclick="removeRentalForever('${docId}')">🗑️</button>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+
+                if (activeCount === 0) {
+                    list.innerHTML = '<div style="text-align:center; color:#777; padding:20px;">No operational vehicle logs are active on the road right now.</div>';
+                }
+
+            } catch (error) {
+                console.error("Error drawing elements from firestore: ", error);
+                list.textContent = "Error parsing tracking matrix data.";
+                list.style.color = "var(--secondary-color)";
+            }
         }
 
         window.addPayment = async (id, currentArrears, currentPaid) => {
-            const paid = prompt("Enter amount paid today:");
+            const paid = prompt("Enter payment installment value (KES):");
             if (paid && !isNaN(paid)) {
                 const amount = parseFloat(paid);
                 await updateDoc(doc(db, "rentals", id), { 
                     arrearsRemaining: currentArrears - amount,
                     amountPaid: currentPaid + amount
                 });
-                alert("Payment updated!");
+                alert("Payment framework updated successfully.");
                 loadRentals();
             }
         };
 
         window.extendRental = async (id, oldDays, rate, currentArrears, startDate) => {
-            const extraDays = prompt("How many additional days?");
+            const extraDays = prompt("Input additional booking extension days:");
             if (extraDays && !isNaN(extraDays)) {
                 const addedDays = parseInt(extraDays);
                 const newTotalDays = oldDays + addedDays;
@@ -129,24 +285,35 @@
                     expectedReturnDate: returnDateString,
                     arrearsRemaining: currentArrears + (addedDays * rate)
                 });
-                alert("Rental extended!");
+                alert("Rental track extended dynamically.");
                 loadRentals();
             }
         };
 
         window.closeRental = async (id, arrears) => {
             if (arrears > 0) {
-                alert("Cannot complete: Client still has KES " + arrears + " in arrears.");
+                alert("Operation Aborted: Cannot secure trip closeout. Outstanding balance of KES " + arrears.toLocaleString() + " remains active.");
                 return;
             }
-            if (confirm("Close this rental record?")) {
+            if (confirm("Archive this trip record as physically returned to yard?")) {
                 await updateDoc(doc(db, "rentals", id), { status: "Completed" });
-                alert("Rental archived.");
+                alert("Rental successfully marked as Completed.");
                 loadRentals();
             }
         };
 
-        loadRentals();
+        window.removeRentalForever = async (id) => {
+            if (confirm("🚨 WARNING: This will permanently delete this record from the database. This action cannot be undone.")) {
+                try {
+                    await deleteDoc(doc(db, "rentals", id));
+                    alert("Record fully deleted.");
+                    loadRentals();
+                } catch (err) {
+                    console.error("Error during deletion: ", err);
+                    alert("Failed to delete track log.");
+                }
+            }
+        };
     </script>
 </body>
 </html>
