@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Revenue Report</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f7f6; }
+        .card { background: white; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #0056b3; }
+    </style>
+</head>
+<body>
+  
+<html>
+<head>
+    <style>
+        /* This CSS makes the navigation horizontal */
+        nav ul {
+            list-style-type: none;
+            padding: 10px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            background-color: #f4f4f4;
+            border-bottom: 2px solid #ddd;
+        }
+        nav a {
+            text-decoration: none;
+            color: #0056b3;
+            font-weight: bold;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="Records1.html">Records</a></li>
+            <li><a href="report.html">Report</a></li>
+            <li><a href="status.html">Status</a></li>
+        </ul>
+    </nav>
+
+    </body>
+</html>
+
+    <div class="card">
+        <h1>Monthly Revenue</h1>
+        <h2 id="revenueDisplay">Calculating...</h2>
+        <a href="dashboard.html">← Back to Dashboard</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyBTYM84E6TSy0Q2QUZSt9MCYn6uAiZ6HpI",
+          authDomain: "site-bcb4b.firebaseapp.com",
+          projectId: "site-bcb4b",
+          storageBucket: "site-bcb4b.firebasestorage.app",
+          messagingSenderId: "586333698174",
+          appId: "1:586333698174:web:cae8db0888c460047d802f",
+          measurementId: "G-2RFQQQ2EPP"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadRevenue() {
+            const querySnapshot = await getDocs(collection(db, "rentals"));
+            let totalRevenue = 0;
+            
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                // Only sum up payments for completed rentals
+                if (data.status === 'Completed') {
+                    totalRevenue += (data.amountPaid || 0);
+                }
+            });
+            
+            document.getElementById('revenueDisplay').innerText = "KES " + totalRevenue.toLocaleString();
+        }
+
+        loadRevenue();
+    </script>
+</body>
+</html>
