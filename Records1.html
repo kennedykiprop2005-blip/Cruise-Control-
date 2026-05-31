@@ -48,7 +48,7 @@
 
         /* --- TABLE & CONTAINER STYLES --- */
         .container { 
-            max-width: 1300px; margin: 0 auto; background: white; 
+            max-width: 1350px; margin: 0 auto; background: white; 
             padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
         }
         .container h2 { text-align: center; color: var(--primary-color); margin-top: 5px; margin-bottom: 20px; }
@@ -98,7 +98,12 @@
         .badge.ongoing { background-color: #e8f5e9; color: var(--success-color); }
         .badge.overdue { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
         
-        /* Action Button */
+        /* Action Layout Buttons */
+        .actions-cell {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
         .action-btn {
             background-color: #6c757d;
             color: white;
@@ -109,9 +114,24 @@
             font-weight: bold;
             cursor: pointer;
             transition: background 0.2s;
+            white-space: nowrap;
         }
         .action-btn:hover {
             background-color: #5a6268;
+        }
+        .delete-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .delete-btn:hover {
+            background-color: #b71c1c;
         }
         
         .loading-text {
@@ -177,7 +197,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBTYM84E6TSy0Q2QUZSt9MCYn6uAiZ6HpI",
@@ -216,7 +236,6 @@
             const recordsTable = document.getElementById('recordsTable');
 
             try {
-                // Fetch ordered by createdAt desc to handle "new data first" structure
                 const q = query(collection(db, "rentals"), orderBy("createdAt", "desc"));
                 const querySnapshot = await getDocs(q);
                 
@@ -232,7 +251,6 @@
                 let activeRecords = [];
                 let completedRecords = [];
 
-                // Separate active logs from completed logs while preserving date structure
                 querySnapshot.forEach((documentSnapshot) => {
                     const data = documentSnapshot.data();
                     const docId = documentSnapshot.id;
@@ -244,7 +262,6 @@
                     }
                 });
 
-                // Recombine arrays to place Active elements directly at the apex
                 const sortedRecords = [...activeRecords, ...completedRecords];
 
                 sortedRecords.forEach((item) => {
@@ -258,13 +275,13 @@
                         ? `<span class="badge clear">Cleared</span>` 
                         : `<span class="badge arrears">KES ${arrearsValue.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>`;
 
-                    // 2. Operational Trip Status
+                    // 2. Operational Trip Status & Action Buttons setup
                     let statusBadge = '';
                     let actionButtonHTML = '';
 
                     if (data.status === 'Completed') {
                         statusBadge = `<span class="badge completed">Completed</span>`;
-                        actionButtonHTML = `<span style="color:#888; font-size:0.8rem;">Returned</span>`;
+                        actionButtonHTML = `<span style="color:#888; font-size:0.8rem; margin-right:5px;">Returned</span>`;
                     } else {
                         if (data.expectedReturnDate && data.expectedReturnDate < todayStr) {
                             statusBadge = `<span class="badge overdue">Overdue</span>`;
@@ -286,12 +303,17 @@
                         <td>${Number(data.ratePerDay).toLocaleString()}</td>
                         <td>${Number(data.amountPaid).toLocaleString()}</td>
                         <td>${financialBadge}</td>
-                        <td>${actionButtonHTML}</td>
+                        <td>
+                            <div class="actions-cell">
+                                ${actionButtonHTML}
+                                <button class="delete-btn" data-id="${docId}">🗑️</button>
+                            </div>
+                        </td>
                     `;
                     tableBody.appendChild(row);
                 });
 
-                // Event listener assignment for real-time state modification buttons
+                // Attach complete trip updates listeners
                 document.querySelectorAll('.action-btn').forEach(button => {
                     button.addEventListener('click', async (e) => {
                         const id = e.target.getAttribute('data-id');
@@ -307,6 +329,25 @@
                                 alert("Failed to update status.");
                                 e.target.textContent = "Complete Trip";
                                 e.target.disabled = false;
+                            }
+                        }
+                    });
+                });
+
+                // Attach complete firestore path deletion listeners
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        // Handle button click even if clicking internal icon cleanly
+                        const id = e.target.closest('.delete-btn').getAttribute('data-id');
+                        if (confirm("🚨 WARNING: Are you sure you want to completely delete this rental record from the database? This cannot be undone.")) {
+                            try {
+                                const rentalRef = doc(db, "rentals", id);
+                                await deleteDoc(rentalRef);
+                                alert("Record fully removed from database.");
+                                fetchRecords(); // Reload the UI layout completely
+                            } catch (err) {
+                                console.error("Error deleting document:", err);
+                                alert("Failed to delete record. Check database structural rule parameters.");
                             }
                         }
                     });
