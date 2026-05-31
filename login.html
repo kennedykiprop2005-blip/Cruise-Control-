@@ -15,6 +15,27 @@
             height: 100vh; 
             margin: 0; 
         }
+        
+        /* --- Loader Screen Layout --- */
+        #authLoader {
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 86, 179, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 15px auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- Main Login Box (Hidden initially) --- */
         .login-box { 
             background: white; 
             padding: 30px; 
@@ -22,6 +43,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
             width: 100%; 
             max-width: 350px; 
+            display: none; 
         }
         h2 { text-align: center; color: var(--primary-color); margin-top: 0; }
         .form-group { margin-bottom: 15px; }
@@ -43,7 +65,12 @@
 </head>
 <body>
 
-    <div class="login-box">
+    <div id="authLoader">
+        <div class="spinner"></div>
+        <div>Checking session authorization...</div>
+    </div>
+
+    <div class="login-box" id="loginBox">
         <h2>CRUISE CONTROL</h2>
         <p style="text-align: center; margin-top: -15px; margin-bottom: 25px; font-size: 14px; color: #666;">Authorized Personnel Only</p>
         
@@ -64,7 +91,8 @@
     <script type="module">
         // 1. Import Firebase Authentication tools
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        // Added 'onAuthStateChanged' to manage pre-render validation gate
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         // 2. Your Firebase Config
         const firebaseConfig = {
@@ -81,36 +109,43 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // 4. Handle the Login Form Submission
+        const authLoader = document.getElementById('authLoader');
+        const loginBox = document.getElementById('loginBox');
         const loginForm = document.getElementById('loginForm');
         const loginBtn = document.getElementById('loginBtn');
         const errorMsg = document.getElementById('errorMsg');
 
+        // 4. Background Auth State Check (Fixes the 2-second visual delay)
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Active authentication token detected. Pass straight through to index.
+                window.location.href = "index.html";
+            } else {
+                // No current token. Drop loader screen and cleanly map the inputs into layout view.
+                authLoader.style.display = 'none';
+                loginBox.style.display = 'block';
+            }
+        });
+
+        // 5. Handle the Login Form Submission
         loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Stop page from refreshing
+            e.preventDefault(); 
             
-            // Show loading state
             loginBtn.textContent = "Verifying...";
             loginBtn.disabled = true;
             errorMsg.textContent = "";
 
-            // Get what the user typed
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
             try {
-                // THIS IS THE CODE THAT LINKS TO FIREBASE
                 await signInWithEmailAndPassword(auth, email, password);
-                
-                // If the code above succeeds, the user is real! Redirect them to the main app:
                 window.location.href = "index.html";
                 
             } catch (error) {
-                // If it fails (wrong password, etc.), show an error
                 console.error("Login Failed:", error.message);
                 errorMsg.textContent = "Invalid email or password.";
                 
-                // Reset button
                 loginBtn.textContent = "Log In";
                 loginBtn.disabled = false;
             }
@@ -118,3 +153,4 @@
     </script>
 </body>
 </html>
+
