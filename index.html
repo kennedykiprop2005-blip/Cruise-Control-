@@ -24,7 +24,7 @@
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            height: 100vh; /* Full screen height for the login box */
+            height: 100vh;
         }
         .login-box { 
             background: white; 
@@ -44,14 +44,44 @@
 
         /* --- MAIN APP SECTION STYLES --- */
         header { 
-            text-align: center; padding: 25px 20px 15px 20px; 
+            text-align: center; padding: 20px 20px 15px 20px; 
             background: #ffffff; border-bottom: 3px solid var(--primary-color); 
             margin-bottom: 10px; border-radius: 0 0 15px 15px; 
         }
+
+        /* --- NAVIGATION STYLES --- */
+        .top-nav {
+            margin: 15px 0;
+        }
+        .top-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap; /* Allows wrapping on small mobile screens */
+        }
+        .top-nav a {
+            text-decoration: none;
+            color: var(--primary-color);
+            background-color: #e9f0f8;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        .top-nav a:hover, .top-nav a.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
         .logout-btn {
             background-color: var(--secondary-color); color: white; border: none;
             padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer;
-            margin-top: 10px; font-size: 0.8rem;
+            margin-top: 5px; font-size: 0.8rem;
         }
         .container { 
             max-width: 600px; margin: 0 auto; background: white; 
@@ -92,25 +122,23 @@
     </div>
 
     <div id="mainAppSection" style="display: none;">
-</head>
-<nav>
-  <ul>
-    <li><a href="index.html">Home</a></li>
-    <li><a href="dashboard.html">Dashboard</a></li>
-    <li><a href="Records.html">Records</a></li>
-    <li><a href="report.html">Report</a></li>
-  </ul>
-</nav>
-
-
-    <header>
         <header>
-            <h1 style="margin: 0; color: var(--primary-color); font-size: 28px; text-transform: uppercase; letter-spacing: 1.5px; -weight: 800;">
+            <h1 style="margin: 0; color: var(--primary-color); font-size: 28px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;">
                 CRUISE CONTROL
             </h1>
             <p style="margin: 5px 0 0 0; color: var(--secondary-color); font-weight: bold; font-size: 18px; letter-spacing: 0.5px;">
                 Rentals & Logistics
             </p>
+
+            <nav class="top-nav">
+                <ul>
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="Records.html">Records</a></li>
+                    <li><a href="report.html">Report</a></li>
+                </ul>
+            </nav>
+
             <button id="logoutBtn" class="logout-btn">Log Out</button>
         </header>
 
@@ -179,14 +207,11 @@
         // AUTHENTICATION LOGIC (The Gatekeeper)
         // =========================================
         
-        // This runs instantly to check if someone is logged in
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Verified User: Hide login, show main app
                 loginSection.style.display = 'none';
                 mainAppSection.style.display = 'block';
             } else {
-                // Not Logged In: Show login, hide main app
                 loginSection.style.display = 'flex';
                 mainAppSection.style.display = 'none';
             }
@@ -208,7 +233,6 @@
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                // The onAuthStateChanged function above will automatically hide this page now
             } catch (error) {
                 console.error("Login Failed:", error.message);
                 errorMsg.textContent = "Invalid email or password.";
@@ -222,13 +246,11 @@
         const logoutBtn = document.getElementById('logoutBtn');
         logoutBtn.addEventListener('click', () => {
             signOut(auth).then(() => {
-                // This clears the user, forcing the screen back to login
                 console.log("Logged out successfully");
             }).catch((error) => {
                 console.error("Logout Error:", error);
             });
         });
-
 
         // =========================================
         // RENTAL FORM CALCULATION & DATABASE LOGIC
