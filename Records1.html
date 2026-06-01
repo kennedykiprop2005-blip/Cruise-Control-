@@ -119,20 +119,6 @@
         .action-btn:hover {
             background-color: #5a6268;
         }
-        .delete-btn {
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .delete-btn:hover {
-            background-color: #b71c1c;
-        }
         
         .loading-text {
             text-align: center;
@@ -197,7 +183,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBTYM84E6TSy0Q2QUZSt9MCYn6uAiZ6HpI",
@@ -306,7 +292,6 @@
                         <td>
                             <div class="actions-cell">
                                 ${actionButtonHTML}
-                                <button class="delete-btn" data-id="${docId}">🗑️</button>
                             </div>
                         </td>
                     `;
@@ -329,25 +314,6 @@
                                 alert("Failed to update status.");
                                 e.target.textContent = "Complete Trip";
                                 e.target.disabled = false;
-                            }
-                        }
-                    });
-                });
-
-                // Attach complete firestore path deletion listeners
-                document.querySelectorAll('.delete-btn').forEach(button => {
-                    button.addEventListener('click', async (e) => {
-                        // Handle button click even if clicking internal icon cleanly
-                        const id = e.target.closest('.delete-btn').getAttribute('data-id');
-                        if (confirm("🚨 WARNING: Are you sure you want to completely delete this rental record from the database? This cannot be undone.")) {
-                            try {
-                                const rentalRef = doc(db, "rentals", id);
-                                await deleteDoc(rentalRef);
-                                alert("Record fully removed from database.");
-                                fetchRecords(); // Reload the UI layout completely
-                            } catch (err) {
-                                console.error("Error deleting document:", err);
-                                alert("Failed to delete record. Check database structural rule parameters.");
                             }
                         }
                     });
