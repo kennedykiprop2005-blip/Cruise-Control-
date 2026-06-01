@@ -163,6 +163,10 @@
 
                 <div class="form-section" style="border-bottom: none;">
                     <h3>3. Rental & Financial Details</h3>
+                    <div class="form-group">
+                        <label for="areaOfUsage">Area of Usage</label>
+                        <input type="text" id="areaOfUsage" required placeholder="e.g., Nairobi, Mombasa, Upcountry">
+                    </div>
                     <div class="form-group"><label for="dateTaken">Date Taken</label><input type="date" id="dateTaken" required></div>
                     <div class="form-group"><label for="timeTaken">Time Taken</label><input type="time" id="timeTaken" required></div>
                     <div class="form-group"><label for="daysTaken">Days Taken</label><input type="number" id="daysTaken" required min="1" placeholder="How many days?"></div>
@@ -307,6 +311,7 @@
                     carColor: document.getElementById('carColor').value,
                     numberPlate: document.getElementById('numberPlate').value,
                     currentMileage: Number(document.getElementById('currentMileage').value),
+                    areaOfUsage: document.getElementById('areaOfUsage').value, // Added logic to capture Area of Usage
                     dateTaken: document.getElementById('dateTaken').value,
                     timeTaken: document.getElementById('timeTaken').value,
                     daysTaken: Number(document.getElementById('daysTaken').value),
