@@ -48,7 +48,7 @@
 
         /* --- TABLE & CONTAINER STYLES --- */
         .container { 
-            max-width: 1350px; margin: 0 auto; background: white; 
+            max-width: 1400px; margin: 0 auto; background: white; 
             padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
         }
         .container h2 { text-align: center; color: var(--primary-color); margin-top: 5px; margin-bottom: 20px; }
@@ -61,11 +61,11 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         
         th, td {
-            padding: 12px 10px;
+            padding: 10px 8px;
             text-align: left;
             border-bottom: 1px solid #eee;
             vertical-align: middle;
@@ -86,7 +86,7 @@
             padding: 4px 8px;
             border-radius: 4px;
             font-weight: bold;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             display: inline-block;
             text-align: center;
         }
@@ -101,23 +101,46 @@
         /* Action Layout Buttons */
         .actions-cell {
             display: flex;
-            gap: 6px;
-            align-items: center;
+            flex-direction: column;
+            gap: 4px;
+            align-items: flex-start;
         }
         .action-btn {
             background-color: #6c757d;
             color: white;
             border: none;
-            padding: 6px 10px;
+            padding: 4px 8px;
             border-radius: 4px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: bold;
             cursor: pointer;
             transition: background 0.2s;
             white-space: nowrap;
+            width: 100%;
         }
         .action-btn:hover {
             background-color: #5a6268;
+        }
+        
+        /* Payment Ledger Styling */
+        .payment-ledger {
+            font-size: 0.75rem;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+        .payment-ledger li {
+            border-bottom: 1px dashed #ddd;
+            padding: 2px 0;
+            white-space: nowrap;
+        }
+        .total-pill {
+            font-weight: bold;
+            display: block;
+            margin-top: 4px;
+            color: #333;
         }
         
         .loading-text {
@@ -166,15 +189,16 @@
                             <th>Date Taken</th>
                             <th>Days</th>
                             <th>Return Date</th>
+                            <th>Description / Notes</th>
                             <th>Trip Status</th>
                             <th>Rate/Day</th>
-                            <th>Paid</th>
+                            <th>Payment History Log</th>
                             <th>Arrears</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -255,26 +279,46 @@
                     const docId = item.id;
                     const row = document.createElement('tr');
 
-                    // 1. Financial Status
-                    const arrearsValue = Number(data.arrearsRemaining) || 0;
-                    const financialBadge = arrearsValue <= 0 
-                        ? `<span class="badge clear">Cleared</span>` 
-                        : `<span class="badge arrears">KES ${arrearsValue.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>`;
+                    // Math Handling for Payment Ledger Lists
+                    const days = Number(data.daysTaken) || 0;
+                    const rate = Number(data.ratePerDay) || 0;
+                    const totalCost = days * rate;
 
-                    // 2. Operational Trip Status & Action Buttons setup
+                    let paymentsListHTML = '';
+                    let runningPaidTotal = 0;
+
+                    // Parse historical logs cleanly
+                    if (data.paymentHistory && Array.isArray(data.paymentHistory)) {
+                        data.paymentHistory.forEach(payment => {
+                            runningPaidTotal += Number(payment.amount) || 0;
+                            paymentsListHTML += `<li>📅 ${payment.date}: <strong>${Number(payment.amount).toLocaleString()}</strong></li>`;
+                        });
+                    } else {
+                        runningPaidTotal = Number(data.amountPaid) || 0;
+                        paymentsListHTML += `<li>📅 Base Setup: <strong>${runningPaidTotal.toLocaleString()}</strong></li>`;
+                    }
+
+                    const dynamicArrears = totalCost - runningPaidTotal;
+
+                    // Financial Status Badges
+                    const financialBadge = dynamicArrears <= 0 
+                        ? `<span class="badge clear">Cleared</span>` 
+                        : `<span class="badge arrears">KES ${dynamicArrears.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>`;
+
+                    // Operational Trip Status Badges
                     let statusBadge = '';
                     let actionButtonHTML = '';
 
                     if (data.status === 'Completed') {
                         statusBadge = `<span class="badge completed">Completed</span>`;
-                        actionButtonHTML = `<span style="color:#888; font-size:0.8rem; margin-right:5px;">Returned</span>`;
+                        actionButtonHTML = `<span style="color:#888; font-size:0.8rem; padding-left: 5px;">Trip Closed</span>`;
                     } else {
                         if (data.expectedReturnDate && data.expectedReturnDate < todayStr) {
                             statusBadge = `<span class="badge overdue">Overdue</span>`;
                         } else {
                             statusBadge = `<span class="badge ongoing">Ongoing</span>`;
                         }
-                        actionButtonHTML = `<button class="action-btn" data-id="${docId}">Complete Trip</button>`;
+                        actionButtonHTML = `<button class="action-btn complete-btn" data-id="${docId}">Complete Trip</button>`;
                     }
 
                     row.innerHTML = `
@@ -285,9 +329,13 @@
                         <td>${data.dateTaken || 'N/A'}</td>
                         <td>${data.daysTaken || '0'} Days</td>
                         <td>${data.expectedReturnDate || 'N/A'}</td>
+                        <td style="max-width: 150px; overflow-wrap: break-word; color: #555; font-style: italic;">${data.description || 'No notes'}</td>
                         <td>${statusBadge}</td>
-                        <td>${Number(data.ratePerDay).toLocaleString()}</td>
-                        <td>${Number(data.amountPaid).toLocaleString()}</td>
+                        <td>${rate.toLocaleString()}</td>
+                        <td>
+                            <ul class="payment-ledger">${paymentsListHTML}</ul>
+                            <span class="total-pill">Total: ${runningPaidTotal.toLocaleString()}</span>
+                        </td>
                         <td>${financialBadge}</td>
                         <td>
                             <div class="actions-cell">
@@ -298,8 +346,8 @@
                     tableBody.appendChild(row);
                 });
 
-                // Attach complete trip updates listeners
-                document.querySelectorAll('.action-btn').forEach(button => {
+                // Event Listener: Complete Trip Closure
+                document.querySelectorAll('.complete-btn').forEach(button => {
                     button.addEventListener('click', async (e) => {
                         const id = e.target.getAttribute('data-id');
                         if (confirm("Mark this vehicle as returned to yard?")) {
@@ -312,8 +360,7 @@
                             } catch (err) {
                                 console.error("Error updating status:", err);
                                 alert("Failed to update status.");
-                                e.target.textContent = "Complete Trip";
-                                e.target.disabled = false;
+                                fetchRecords();
                             }
                         }
                     });
