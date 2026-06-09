@@ -125,6 +125,26 @@
             color: var(--success-color);
             font-weight: bold;
         }
+
+        /* Payment Ledger UI Tuning */
+        .dash-ledger {
+            list-style: none;
+            padding: 0;
+            margin: 6px 0;
+            font-size: 0.85rem;
+            color: #555;
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 6px 10px;
+            border: 1px dashed #ddd;
+        }
+        .dash-ledger li {
+            padding: 2px 0;
+            border-bottom: 1px dashed #eee;
+        }
+        .dash-ledger li:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
 <body>
@@ -177,7 +197,9 @@
 
         const mainAppSection = document.getElementById('mainAppSection');
 
-        // Security Authentication Router Verification Gate
+        // Global store array to preserve state records between callback loops
+        let localActiveCache = [];
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 mainAppSection.style.display = 'block';
@@ -196,11 +218,11 @@
         async function loadRentals() {
             const list = document.getElementById('rentalList');
             try {
-                // Fetching elements ordered by newest input dates first
                 const q = query(collection(db, "rentals"), orderBy("createdAt", "desc"));
                 const querySnapshot = await getDocs(q);
                 
                 list.innerHTML = '';
+                localActiveCache = [];
                 
                 let activeCount = 0;
                 const today = new Date();
@@ -210,19 +232,36 @@
                     const data = documentSnapshot.data();
                     const docId = documentSnapshot.id;
                     
-                    // Filter out finished entries completely from the active board view
                     if (data.status === 'Completed') return;
                     activeCount++;
+                    
+                    // Cache record values locally to track state transitions during prompt execution
+                    localActiveCache.push({ id: docId, data: data });
 
                     const returnDate = new Date(data.expectedReturnDate);
                     const timeDiff = returnDate - today;
                     const daysUntilReturn = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
                     const isUrgent = daysUntilReturn <= 1;
 
-                    const arrearsVal = Number(data.arrearsRemaining) || 0;
-                    const financialString = arrearsVal <= 0 
+                    // Compute dynamic payment logs locally
+                    const totalCost = (Number(data.daysTaken) || 0) * (Number(data.ratePerDay) || 0);
+                    let runningPaidTotal = 0;
+                    let historyHTML = '';
+
+                    if (data.paymentHistory && Array.isArray(data.paymentHistory)) {
+                        data.paymentHistory.forEach(payment => {
+                            runningPaidTotal += Number(payment.amount) || 0;
+                            historyHTML += `<li>📅 ${payment.date}: <strong>KES ${Number(payment.amount).toLocaleString()}</strong></li>`;
+                        });
+                    } else {
+                        runningPaidTotal = Number(data.amountPaid) || 0;
+                        historyHTML += `<li>📅 Base Setup: <strong>KES ${runningPaidTotal.toLocaleString()}</strong></li>`;
+                    }
+
+                    const dynamicArrears = totalCost - runningPaidTotal;
+                    const financialString = dynamicArrears <= 0 
                         ? `<span class="cleared-text">Cleared</span>` 
-                        : `<span class="arrears-text">KES ${arrearsVal.toLocaleString()}</span>`;
+                        : `<span class="arrears-text">KES ${dynamicArrears.toLocaleString()}</span>`;
 
                     const div = document.createElement('div');
                     div.className = isUrgent ? 'card urgent' : 'card';
@@ -230,15 +269,20 @@
                         <div style="font-size: 1.1rem; margin-bottom: 5px;"><strong>${data.clientName || 'N/A'}</strong></div>
                         <div style="color: #555; font-size: 0.95rem; line-height: 1.5;">
                             Vehicle Model: <strong>${data.carModel || 'N/A'}</strong> | Plate: <span class="plate-badge">${data.numberPlate || 'N/A'}</span><br>
-                            Arrears Balance: ${financialString}<br>
                             Expected Return: <strong>${data.expectedReturnDate || 'N/A'}</strong>
+                            
+                            <div style="margin-top: 8px; font-weight: 600; color: #333;">Payment Logs History:</div>
+                            <ul class="dash-ledger">${historyHTML}</ul>
+                            
+                            Total Paid: <strong style="color:var(--success-color)">KES ${runningPaidTotal.toLocaleString()}</strong><br>
+                            Arrears Balance: ${financialString}
                         </div>
                         ${isUrgent ? `<div style="color: var(--secondary-color); font-weight: bold; margin-top: 8px; font-size: 0.9rem;">⚠️ Due Imminently: Less than 24 hours remaining!</div>` : ''}
                         
                         <div class="btn-group">
-                            <button onclick="addPayment('${docId}', ${arrearsVal}, ${Number(data.amountPaid || 0)})">Record Payment</button>
-                            <button class="extend-btn" onclick="extendRental('${docId}', ${Number(data.daysTaken || 0)}, ${Number(data.ratePerDay || 0)}, ${arrearsVal}, '${data.dateTaken}')">Extend Trip</button>
-                            <button class="complete-btn" onclick="closeRental('${docId}', ${arrearsVal})">Complete</button>
+                            <button onclick="addPayment('${docId}', ${dynamicArrears}, ${runningPaidTotal})">Record Payment</button>
+                            <button class="extend-btn" onclick="extendRental('${docId}', ${Number(data.daysTaken || 0)}, ${Number(data.ratePerDay || 0)}, ${dynamicArrears}, '${data.dateTaken}')">Extend Trip</button>
+                            <button class="complete-btn" onclick="closeRental('${docId}', ${dynamicArrears})">Complete</button>
                         </div>
                     `;
                     list.appendChild(div);
@@ -255,16 +299,47 @@
             }
         }
 
-        window.addPayment = async (id, currentArrears, currentPaid) => {
-            const paid = prompt("Enter payment installment value (KES):");
-            if (paid && !isNaN(paid)) {
-                const amount = parseFloat(paid);
+        window.addPayment = async (id, currentArrears, baselinePaid) => {
+            if (currentArrears <= 0) {
+                alert("This account is already fully paid up!");
+                return;
+            }
+
+            const paidInput = prompt(`Remaining Balance: KES ${currentArrears.toLocaleString()}\nEnter payment installment value (KES):`);
+            if (paidInput === null || paidInput.trim() === "") return;
+
+            const addedAmt = parseFloat(paidInput);
+            if (isNaN(addedAmt) || addedAmt <= 0) {
+                alert("Invalid value. Please enter a valid positive number.");
+                return;
+            }
+
+            try {
+                const targetRecord = localActiveCache.find(item => item.id === id);
+                const todayStr = new Date().toISOString().split('T')[0];
+                
+                // Build array history pipeline safely
+                let history = targetRecord.data.paymentHistory || [
+                    { date: targetRecord.data.dateTaken || todayStr, amount: baselinePaid }
+                ];
+                
+                // Append new transaction record entry 
+                history.push({ date: todayStr, amount: addedAmt });
+
+                const updatedTotalPaid = baselinePaid + addedAmt;
+                const updatedArrears = (Number(targetRecord.data.daysTaken) * Number(targetRecord.data.ratePerDay)) - updatedTotalPaid;
+
                 await updateDoc(doc(db, "rentals", id), { 
-                    arrearsRemaining: currentArrears - amount,
-                    amountPaid: currentPaid + amount
+                    paymentHistory: history,
+                    amountPaid: updatedTotalPaid,
+                    arrearsRemaining: updatedArrears
                 });
-                alert("Payment framework updated successfully.");
+                
+                alert("Payment logged into history ledger entry!");
                 loadRentals();
+            } catch (err) {
+                console.error("Payment sync execution failure: ", err);
+                alert("Failed to submit payment update.");
             }
         };
 
