@@ -35,7 +35,7 @@
             to { transform: rotate(360deg); }
         }
 
-        /* --- Main Login Box (Hidden initially) --- */
+        /* --- Main Login Box --- */
         .login-box { 
             background: white; 
             padding: 30px; 
@@ -67,7 +67,7 @@
 
     <div id="authLoader">
         <div class="spinner"></div>
-        <div>Checking session authorization...</div>
+        <div>Preparing secure terminal...</div>
     </div>
 
     <div class="login-box" id="loginBox">
@@ -81,7 +81,7 @@
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" required placeholder="••••••••">
+                <input type="password" id="password" required placeholder="••••••••" autocomplete="new-password">
             </div>
             <button type="submit" class="login-btn" id="loginBtn">Log In</button>
             <div id="errorMsg" class="error-msg"></div>
@@ -91,8 +91,7 @@
     <script type="module">
         // 1. Import Firebase Authentication tools
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        // Added 'onAuthStateChanged' to manage pre-render validation gate
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         // 2. Your Firebase Config
         const firebaseConfig = {
@@ -115,16 +114,15 @@
         const loginBtn = document.getElementById('loginBtn');
         const errorMsg = document.getElementById('errorMsg');
 
-        // 4. Background Auth State Check (Fixes the 2-second visual delay)
-        onAuthStateChanged(auth, (user) => {
+        // 4. Force Session Reset on load (Prevents auto pass-through bypass)
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // Active authentication token detected. Pass straight through to index.
-                window.location.href = "index.html";
-            } else {
-                // No current token. Drop loader screen and cleanly map the inputs into layout view.
-                authLoader.style.display = 'none';
-                loginBox.style.display = 'block';
+                // Persistent user session found, clear it out immediately
+                await signOut(auth);
             }
+            // Present a clean login input block every single visit
+            authLoader.style.display = 'none';
+            loginBox.style.display = 'block';
         });
 
         // 5. Handle the Login Form Submission
