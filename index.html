@@ -1,375 +1,346 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cruise Control | App</title>
-    <style>
-        :root {
-            --primary-color: #0056b3;
-            --secondary-color: #d32f2f;
-            --background-color: #f4f7f6;
-        }
-        
-        /* Base Body Styles */
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background-color: var(--background-color); 
-            margin: 0; 
-            padding-bottom: 20px; 
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cruise Control | App</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --secondary-color: #d32f2f;
+            --background-color: #f4f7f6;
+        }
+        
+        /* Base Body Styles */
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: var(--background-color); 
+            margin: 0; 
+            padding-bottom: 20px; 
+        }
 
-        /* --- LOGIN SECTION STYLES --- */
-        #loginSection {
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh;
-        }
-        .login-box { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
-            width: 100%; 
-            max-width: 350px; 
-        }
-        .login-box h2 { text-align: center; color: var(--primary-color); margin-top: 0; }
-        .login-btn { 
-            background-color: var(--primary-color); 
-            color: white; border: none; padding: 12px; width: 100%; 
-            border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px;
-        }
-        .error-msg { color: #d32f2f; text-align: center; font-size: 0.85rem; margin-top: 10px; min-height: 20px;}
+        /* --- LOGIN SECTION STYLES --- */
+        #loginSection {
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh;
+        }
+        .login-box { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 350px; 
+        }
+        .login-box h2 { text-align: center; color: var(--primary-color); margin-top: 0; }
+        .login-btn { 
+            background-color: var(--primary-color); 
+            color: white; border: none; padding: 12px; width: 100%; 
+            border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px;
+        }
+        .error-msg { color: #d32f2f; text-align: center; font-size: 0.85rem; margin-top: 10px; min-height: 20px;}
 
-        /* --- MAIN APP SECTION STYLES --- */
-        header { 
-            text-align: center; padding: 20px 20px 15px 20px; 
-            background: #ffffff; border-bottom: 3px solid var(--primary-color); 
-            margin-bottom: 10px; border-radius: 0 0 15px 15px; 
-        }
+        /* --- MAIN APP SECTION STYLES --- */
+        header { 
+            text-align: center; padding: 20px 20px 15px 20px; 
+            background: #ffffff; border-bottom: 3px solid var(--primary-color); 
+            margin-bottom: 10px; border-radius: 0 0 15px 15px; 
+        }
 
-        /* --- NAVIGATION STYLES --- */
-        .top-nav {
-            margin: 15px 0;
-        }
-        .top-nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .top-nav a {
-            text-decoration: none;
-            color: var(--primary-color);
-            background-color: #e9f0f8;
-            padding: 8px 16px;
-            border-radius: 5px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
-        }
-        .top-nav a:hover, .top-nav a.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
+        /* --- NAVIGATION STYLES --- */
+        .top-nav {
+            margin: 15px 0;
+        }
+        .top-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap; /* Allows wrapping on small mobile screens */
+        }
+        .top-nav a {
+            text-decoration: none;
+            color: var(--primary-color);
+            background-color: #e9f0f8;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        .top-nav a:hover, .top-nav a.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
 
-        .logout-btn {
-            background-color: var(--secondary-color); color: white; border: none;
-            padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer;
-            margin-top: 5px; font-size: 0.8rem;
-        }
-        .container { 
-            max-width: 600px; margin: 0 auto; background: white; 
-            padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-        }
-        .container h2 { text-align: center; color: var(--primary-color); margin-top: 5px; }
-        .form-section { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .form-group { margin-bottom: 10px; }
-        label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 3px; }
-        input, textarea, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
-        textarea { resize: vertical; }
-        input[readonly] { background-color: #f8f9fa; }
-        .submit-btn { 
-            background-color: var(--primary-color); color: white; border: none; 
-            padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; 
-        }
-    </style>
+        .logout-btn {
+            background-color: var(--secondary-color); color: white; border: none;
+            padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer;
+            margin-top: 5px; font-size: 0.8rem;
+        }
+        .container { 
+            max-width: 600px; margin: 0 auto; background: white; 
+            padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }
+        .container h2 { text-align: center; color: var(--primary-color); margin-top: 5px; }
+        .form-section { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .form-group { margin-bottom: 10px; }
+        label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 3px; }
+        input, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
+        textarea { resize: vertical; } /* Allows users to expand the text box vertically */
+        input[readonly] { background-color: #f8f9fa; }
+        .submit-btn { 
+            background-color: var(--primary-color); color: white; border: none; 
+            padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; 
+        }
+    </style>
 </head>
 <body>
 
-    <div id="loginSection">
-        <div class="login-box">
-            <h2>CRUISE CONTROL</h2>
-            <p style="text-align: center; margin-top: -15px; margin-bottom: 25px; font-size: 14px; color: #666;">Authorized Personnel Only</p>
-            
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" required placeholder="admin@example.com">
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" required placeholder="••••••••" autocomplete="new-password">
-                </div>
-                <button type="submit" class="login-btn" id="loginBtn">Log In</button>
-                <div id="errorMsg" class="error-msg"></div>
-            </form>
-        </div>
-    </div>
+    <div id="loginSection">
+        <div class="login-box">
+            <h2>CRUISE CONTROL</h2>
+            <p style="text-align: center; margin-top: -15px; margin-bottom: 25px; font-size: 14px; color: #666;">Authorized Personnel Only</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" required placeholder="admin@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="login-btn" id="loginBtn">Log In</button>
+                <div id="errorMsg" class="error-msg"></div>
+            </form>
+        </div>
+    </div>
 
-    <div id="mainAppSection" style="display: none;">
-        <header>
-            <h1 style="margin: 0; color: var(--primary-color); font-size: 28px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;">
-                CRUISE CONTROL
-            </h1>
-            <p style="margin: 5px 0 0 0; color: var(--secondary-color); font-weight: bold; font-size: 18px; letter-spacing: 0.5px;">
-                Rentals & Logistics
-            </p>
+    <div id="mainAppSection" style="display: none;">
+        <header>
+            <h1 style="margin: 0; color: var(--primary-color); font-size: 28px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;">
+                CRUISE CONTROL
+            </h1>
+            <p style="margin: 5px 0 0 0; color: var(--secondary-color); font-weight: bold; font-size: 18px; letter-spacing: 0.5px;">
+                Rentals & Logistics
+            </p>
 
-            <nav class="top-nav">
-                <ul>
-                    <li><a href="index.html" class="active">Home</a></li>
-                    <li><a href="dashboard.html">Dashboard</a></li>
-                    <li><a href="Records1.html">Records</a></li>
-                    <li><a href="suppliers.html">Suppliers Manager</a></li>
-                    <li><a href="report.html">Report</a></li>
-                </ul>
-            </nav>
+            <nav class="top-nav">
+                <ul>
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="Records1.html">Records</a></li>
+                    <li><a href="report.html">Report</a></li>
+                </ul>
+            </nav>
 
-            <button id="logoutBtn" class="logout-btn">Log Out</button>
-        </header>
+            <button id="logoutBtn" class="logout-btn">Log Out</button>
+        </header>
 
-        <div class="container">
-            <h2>New Rental Log</h2>
-            
-            <form id="rentalForm">
-                <div class="form-section">
-                    <h3>1. Client Details</h3>
-                    <div class="form-group"><label for="clientName">Full Name</label><input type="text" id="clientName" required placeholder="e.g., John Doe"></div>
-                    <div class="form-group"><label for="clientPhone">Phone Number</label><input type="tel" id="clientPhone" required placeholder="e.g., 0712 345 678"></div>
-                    <div class="form-group"><label for="clientEmail">Email Address (Optional)</label><input type="email" id="clientEmail" placeholder="e.g., john@example.com"></div>
-                </div>
+        <div class="container">
+            <h2>New Rental Log</h2>
+            
+            <form id="rentalForm">
+                <div class="form-section">
+                    <h3>1. Client Details</h3>
+                    <div class="form-group"><label for="clientName">Full Name</label><input type="text" id="clientName" required placeholder="e.g., John Doe"></div>
+                    <div class="form-group"><label for="clientPhone">Phone Number</label><input type="tel" id="clientPhone" required placeholder="e.g., 0712 345 678"></div>
+                    <div class="form-group"><label for="clientEmail">Email Address (Optional)</label><input type="email" id="clientEmail" placeholder="e.g., john@example.com"></div>
+                </div>
 
-                <div class="form-section">
-                    <h3>2. Vehicle Details</h3>
-                    <div class="form-group">
-                        <label for="carModel">Car Model</label>
-                        <select id="carModel" required>
-                            <option value="">-- Select Fleet Vehicle --</option>
-                            <option value="Toyota Land Cruiser V8">Toyota Land Cruiser V8</option>
-                            <option value="Toyota Prado">Toyota Prado</option>
-                            <option value="Subaru Forester e-BOXER">Subaru Forester e-BOXER</option>
-                            <option value="Mazda CX-5">Mazda CX-5</option>
-                            <option value="Toyota Vellfire">Toyota Vellfire</option>
-                            <option value="Nissan Elgrand">Nissan Elgrand</option>
-                            <option value="Toyota Probox">Toyota Probox</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label for="carColor">Color</label><input type="text" id="carColor" required placeholder="e.g., Silver"></div>
-                    <div class="form-group"><label for="numberPlate">Number Plate</label><input type="text" id="numberPlate" required placeholder="e.g., KBC 123A" style="text-transform: uppercase;"></div>
-                    <div class="form-group"><label for="currentMileage">Current Mileage (km)</label><input type="number" id="currentMileage" required placeholder="e.g., 85000"></div>
-                </div>
+                <div class="form-section">
+                    <h3>2. Vehicle Details</h3>
+                    <div class="form-group"><label for="carModel">Car Model</label><input type="text" id="carModel" required placeholder="e.g., Toyota Prado J150"></div>
+                    <div class="form-group"><label for="carColor">Color</label><input type="text" id="carColor" required placeholder="e.g., Silver"></div>
+                    <div class="form-group"><label for="numberPlate">Number Plate</label><input type="text" id="numberPlate" required placeholder="e.g., KBC 123A"></div>
+                    <div class="form-group"><label for="currentMileage">Current Mileage (km)</label><input type="number" id="currentMileage" required placeholder="e.g., 85000"></div>
+                </div>
 
-                <div class="form-section" style="border-bottom: none;">
-                    <h3>3. Rental & Financial Details</h3>
-                    <div class="form-group">
-                        <label for="areaOfUsage">Area of Usage</label>
-                        <input type="text" id="areaOfUsage" required placeholder="e.g., Nairobi, Mombasa, Upcountry">
-                    </div>
-                    <div class="form-group">
-                        <label for="description">Description / Notes (Optional)</label>
-                        <textarea id="description" rows="3" placeholder="Enter vehicle condition, special requests, or extra notes"></textarea>
-                    </div>
-                    <div class="form-group"><label for="dateTaken">Date Taken</label><input type="date" id="dateTaken" required></div>
-                    <div class="form-group"><label for="timeTaken">Time Taken</label><input type="time" id="timeTaken" required></div>
-                    <div class="form-group"><label for="daysTaken">Days Taken</label><input type="number" id="daysTaken" required min="1" placeholder="How many days?"></div>
-                    <div class="form-group"><label for="returnDate">Expected Return Date</label><input type="date" id="returnDate" readonly></div>
-                    <div class="form-group"><label for="ratePerDay">Rate Per Day</label><input type="number" id="ratePerDay" required placeholder="Amount per day"></div>
-                    <div class="form-group"><label for="amountPaid">Amount Paid</label><input type="number" id="amountPaid" required placeholder="Total initial payment"></div>
-                    <div class="form-group"><label for="arrearsRemaining">Arrears Remaining (Calculated)</label><input type="number" id="arrearsRemaining" readonly placeholder="Auto-calculated"></div>
-                </div>
+                <div class="form-section" style="border-bottom: none;">
+                    <h3>3. Rental & Financial Details</h3>
+                    <div class="form-group">
+                        <label for="areaOfUsage">Area of Usage</label>
+                        <input type="text" id="areaOfUsage" required placeholder="e.g., Nairobi, Mombasa, Upcountry">
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description / Notes (Optional)</label>
+                        <textarea id="description" rows="3" placeholder="Enter vehicle condition, special requests, or extra notes"></textarea>
+                    </div>
+                    <div class="form-group"><label for="dateTaken">Date Taken</label><input type="date" id="dateTaken" required></div>
+                    <div class="form-group"><label for="timeTaken">Time Taken</label><input type="time" id="timeTaken" required></div>
+                    <div class="form-group"><label for="daysTaken">Days Taken</label><input type="number" id="daysTaken" required min="1" placeholder="How many days?"></div>
+                    <div class="form-group"><label for="returnDate">Expected Return Date</label><input type="date" id="returnDate" readonly></div>
+                    <div class="form-group"><label for="ratePerDay">Rate Per Day</label><input type="number" id="ratePerDay" required placeholder="Amount per day"></div>
+                    <div class="form-group"><label for="amountPaid">Amount Paid</label><input type="number" id="amountPaid" required placeholder="Total initial payment"></div>
+                    <div class="form-group"><label for="arrearsRemaining">Arrears Remaining (Calculated)</label><input type="number" id="arrearsRemaining" readonly placeholder="Auto-calculated"></div>
+                </div>
 
-                <button type="submit" class="submit-btn">Save Rental Record</button>
-            </form>
-        </div>
-    </div>
+                <button type="submit" class="submit-btn">Save Rental Record</button>
+            </form>
+        </div>
+    </div>
 
-    <script type="module">
-        // 1. Combine Imports for both Auth and Firestore
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    <script type="module">
+        // 1. Combine Imports for both Auth and Firestore
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // 2. Firebase Configuration
-        const firebaseConfig = {
-          apiKey: "AIzaSyBTYM84E6TSy0Q2QUZSt9MCYn6uAiZ6HpI",
-          authDomain: "site-bcb4b.firebaseapp.com",
-          projectId: "site-bcb4b",
-          storageBucket: "site-bcb4b.firebasestorage.app",
-          messagingSenderId: "586333698174",
-          appId: "1:586333698174:web:cae8db0888c460047d802f",
-          measurementId: "G-2RFQQQ2EPP"
-        };
+        // 2. Firebase Configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyBTYM84E6TSy0Q2QUZSt9MCYn6uAiZ6HpI",
+          authDomain: "site-bcb4b.firebaseapp.com",
+          projectId: "site-bcb4b",
+          storageBucket: "site-bcb4b.firebasestorage.app",
+          messagingSenderId: "586333698174",
+          appId: "1:586333698174:web:cae8db0888c460047d802f",
+          measurementId: "G-2RFQQQ2EPP"
+        };
 
-        // 3. Initialize Firebase, Auth, and Firestore
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        // 3. Initialize Firebase, Auth, and Firestore
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // UI Sections
-        const loginSection = document.getElementById('loginSection');
-        const mainAppSection = document.getElementById('mainAppSection');
+        // UI Sections
+        const loginSection = document.getElementById('loginSection');
+        const mainAppSection = document.getElementById('mainAppSection');
 
-        // =========================================
-        // AUTHENTICATION LOGIC (The Gatekeeper)
-        // =========================================
-        
-        // Forced Session Reset on load to stop auto login bypass
-        onAuthStateChanged(auth, async (user) => {
-            if (user && loginSection.style.display !== 'none') {
-                // An active saved session was caught on cold load, purge it
-                await signOut(auth);
-                loginSection.style.display = 'flex';
-                mainAppSection.style.display = 'none';
-            } else if (user) {
-                // Normal operational runtime transition
-                loginSection.style.display = 'none';
-                mainAppSection.style.display = 'block';
-            } else {
-                loginSection.style.display = 'flex';
-                mainAppSection.style.display = 'none';
-            }
-        });
+        // =========================================
+        // AUTHENTICATION LOGIC (The Gatekeeper)
+        // =========================================
+        
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loginSection.style.display = 'none';
+                mainAppSection.style.display = 'block';
+            } else {
+                loginSection.style.display = 'flex';
+                mainAppSection.style.display = 'none';
+            }
+        });
 
-        // Handle the Login Button
-        const loginForm = document.getElementById('loginForm');
-        const loginBtn = document.getElementById('loginBtn');
-        const errorMsg = document.getElementById('errorMsg');
+        // Handle the Login Button
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMsg = document.getElementById('errorMsg');
 
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            loginBtn.textContent = "Verifying...";
-            loginBtn.disabled = true;
-            errorMsg.textContent = "";
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginBtn.textContent = "Verifying...";
+            loginBtn.disabled = true;
+            errorMsg.textContent = "";
 
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-            try {
-                // Setting UI displays straight inside the response stream manually to prevent flicker
-                await signInWithEmailAndPassword(auth, email, password);
-                loginSection.style.display = 'none';
-                mainAppSection.style.display = 'block';
-            } catch (error) {
-                console.error("Login Failed:", error.message);
-                errorMsg.textContent = "Invalid email or password.";
-            } finally {
-                loginBtn.textContent = "Log In";
-                loginBtn.disabled = false;
-            }
-        });
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                console.error("Login Failed:", error.message);
+                errorMsg.textContent = "Invalid email or password.";
+            } finally {
+                loginBtn.textContent = "Log In";
+                loginBtn.disabled = false;
+            }
+        });
 
-        // Handle the Logout Button
-        const logoutBtn = document.getElementById('logoutBtn');
-        logoutBtn.addEventListener('click', () => {
-            signOut(auth).then(() => {
-                console.log("Logged out successfully");
-            }).catch((error) => {
-                console.error("Logout Error:", error);
-            });
-        });
+        // Handle the Logout Button
+        const logoutBtn = document.getElementById('logoutBtn');
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth).then(() => {
+                console.log("Logged out successfully");
+            }).catch((error) => {
+                console.error("Logout Error:", error);
+            });
+        });
 
-        // =========================================
-        // RENTAL FORM CALCULATION & DATABASE LOGIC
-        // =========================================
-        const dateTakenInput = document.getElementById('dateTaken');
-        const daysTakenInput = document.getElementById('daysTaken');
-        const returnDateInput = document.getElementById('returnDate');
-        const ratePerDayInput = document.getElementById('ratePerDay');
-        const amountPaidInput = document.getElementById('amountPaid');
-        const arrearsRemainingInput = document.getElementById('arrearsRemaining');
+        // =========================================
+        // RENTAL FORM CALCULATION & DATABASE LOGIC
+        // =========================================
+        const dateTakenInput = document.getElementById('dateTaken');
+        const daysTakenInput = document.getElementById('daysTaken');
+        const returnDateInput = document.getElementById('returnDate');
+        const ratePerDayInput = document.getElementById('ratePerDay');
+        const amountPaidInput = document.getElementById('amountPaid');
+        const arrearsRemainingInput = document.getElementById('arrearsRemaining');
 
-        function updateCalculations() {
-            const dateTakenVal = dateTakenInput.value;
-            const daysTaken = parseInt(daysTakenInput.value) || 0;
-            const rate = parseFloat(ratePerDayInput.value) || 0;
-            const paid = parseFloat(amountPaidInput.value) || 0;
+        function updateCalculations() {
+            const dateTakenVal = dateTakenInput.value;
+            const daysTaken = parseInt(daysTakenInput.value) || 0;
+            const rate = parseFloat(ratePerDayInput.value) || 0;
+            const paid = parseFloat(amountPaidInput.value) || 0;
 
-            if (dateTakenVal && daysTaken > 0) {
-                const takenDate = new Date(dateTakenVal);
-                takenDate.setDate(takenDate.getDate() + daysTaken);
-                returnDateInput.value = takenDate.toISOString().split('T')[0];
-            } else {
-                returnDateInput.value = '';
-            }
+            if (dateTakenVal && daysTaken > 0) {
+                const takenDate = new Date(dateTakenVal);
+                takenDate.setDate(takenDate.getDate() + daysTaken);
+                returnDateInput.value = takenDate.toISOString().split('T')[0];
+            } else {
+                returnDateInput.value = '';
+            }
 
-            if (daysTaken > 0 && rate > 0) {
-                const totalCost = daysTaken * rate;
-                const arrears = totalCost - paid;
-                arrearsRemainingInput.value = arrears.toFixed(2);
-            } else {
-                arrearsRemainingInput.value = '';
-            }
-        }
+            if (daysTaken > 0 && rate > 0) {
+                const totalCost = daysTaken * rate;
+                const arrears = totalCost - paid;
+                arrearsRemainingInput.value = arrears.toFixed(2);
+            } else {
+                arrearsRemainingInput.value = '';
+            }
+        }
 
-        dateTakenInput.addEventListener('change', updateCalculations);
-        daysTakenInput.addEventListener('input', updateCalculations);
-        ratePerDayInput.addEventListener('input', updateCalculations);
-        amountPaidInput.addEventListener('input', updateCalculations);
+        dateTakenInput.addEventListener('change', updateCalculations);
+        daysTakenInput.addEventListener('input', updateCalculations);
+        ratePerDayInput.addEventListener('input', updateCalculations);
+        amountPaidInput.addEventListener('input', updateCalculations);
 
-        const rentalForm = document.getElementById('rentalForm');
-        
-        rentalForm.addEventListener('submit', async (e) => {
-            e.preventDefault(); 
-            const submitBtn = document.querySelector('.submit-btn');
-            submitBtn.textContent = "Saving...";
-            submitBtn.disabled = true;
+        const rentalForm = document.getElementById('rentalForm');
+        
+        rentalForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.textContent = "Saving...";
+            submitBtn.disabled = true;
 
-            try {
-                const rentalData = {
-                    clientName: document.getElementById('clientName').value,
-                    clientPhone: document.getElementById('clientPhone').value,
-                    clientEmail: document.getElementById('clientEmail').value,
-                    carModel: document.getElementById('carModel').value,
-                    carColor: document.getElementById('carColor').value,
-                    numberPlate: document.getElementById('numberPlate').value.toUpperCase(),
-                    currentMileage: Number(document.getElementById('currentMileage').value),
-                    areaOfUsage: document.getElementById('areaOfUsage').value,
-                    description: document.getElementById('description').value || "",
-                    dateTaken: document.getElementById('dateTaken').value,
-                    timeTaken: document.getElementById('timeTaken').value,
-                    daysTaken: Number(document.getElementById('daysTaken').value),
-                    expectedReturnDate: document.getElementById('returnDate').value,
-                    ratePerDay: Number(document.getElementById('ratePerDay').value),
-                    amountPaid: Number(document.getElementById('amountPaid').value),
-                    arrearsRemaining: Number(document.getElementById('arrearsRemaining').value),
-                    status: "Ongoing",
-                    createdAt: new Date().toISOString(),
-                    paymentHistory: [
-                        { date: document.getElementById('dateTaken').value, amount: Number(document.getElementById('amountPaid').value) }
-                    ]
-                };
+            try {
+                const rentalData = {
+                    clientName: document.getElementById('clientName').value,
+                    clientPhone: document.getElementById('clientPhone').value,
+                    clientEmail: document.getElementById('clientEmail').value,
+                    carModel: document.getElementById('carModel').value,
+                    carColor: document.getElementById('carColor').value,
+                    numberPlate: document.getElementById('numberPlate').value,
+                    currentMileage: Number(document.getElementById('currentMileage').value),
+                    areaOfUsage: document.getElementById('areaOfUsage').value,
+                    description: document.getElementById('description').value || "", // Submits empty string if left blank
+                    dateTaken: document.getElementById('dateTaken').value,
+                    timeTaken: document.getElementById('timeTaken').value,
+                    daysTaken: Number(document.getElementById('daysTaken').value),
+                    expectedReturnDate: document.getElementById('returnDate').value,
+                    ratePerDay: Number(document.getElementById('ratePerDay').value),
+                    amountPaid: Number(document.getElementById('amountPaid').value),
+                    arrearsRemaining: Number(document.getElementById('arrearsRemaining').value),
+                    createdAt: new Date().toISOString()
+                };
 
-                await addDoc(collection(db, "rentals"), rentalData);
+                await addDoc(collection(db, "rentals"), rentalData);
 
-                alert("Rental record saved successfully to Firebase!");
-                rentalForm.reset();
-                arrearsRemainingInput.value = '';
-                returnDateInput.value = '';
-                
-            } catch (error) {
-                console.error("Error adding document: ", error);
-                alert("Error saving record. Check internet or server connectivity rules.");
-            } finally {
-                submitBtn.textContent = "Save Rental Record";
-                submitBtn.disabled = false;
-            }
-        });
-    </script>
+                alert("Rental record saved successfully to Firebase!");
+                rentalForm.reset();
+                
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert("Error saving record. Make sure your Firestore database is in 'Test Mode'.");
+            } finally {
+                submitBtn.textContent = "Save Rental Record";
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>
