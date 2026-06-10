@@ -60,7 +60,7 @@
             display: flex;
             justify-content: center;
             gap: 10px;
-            flex-wrap: wrap; /* Allows wrapping on small mobile screens */
+            flex-wrap: wrap;
         }
         .top-nav a {
             text-decoration: none;
@@ -91,8 +91,8 @@
         .form-section { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .form-group { margin-bottom: 10px; }
         label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 3px; }
-        input, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
-        textarea { resize: vertical; } /* Allows users to expand the text box vertically */
+        input, textarea, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
+        textarea { resize: vertical; }
         input[readonly] { background-color: #f8f9fa; }
         .submit-btn { 
             background-color: var(--primary-color); color: white; border: none; 
@@ -114,7 +114,7 @@
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" required placeholder="••••••••">
+                    <input type="password" id="password" required placeholder="••••••••" autocomplete="new-password">
                 </div>
                 <button type="submit" class="login-btn" id="loginBtn">Log In</button>
                 <div id="errorMsg" class="error-msg"></div>
@@ -136,6 +136,7 @@
                     <li><a href="index.html" class="active">Home</a></li>
                     <li><a href="dashboard.html">Dashboard</a></li>
                     <li><a href="Records1.html">Records</a></li>
+                    <li><a href="suppliers.html">Suppliers Manager</a></li>
                     <li><a href="report.html">Report</a></li>
                 </ul>
             </nav>
@@ -156,9 +157,21 @@
 
                 <div class="form-section">
                     <h3>2. Vehicle Details</h3>
-                    <div class="form-group"><label for="carModel">Car Model</label><input type="text" id="carModel" required placeholder="e.g., Toyota Prado J150"></div>
+                    <div class="form-group">
+                        <label for="carModel">Car Model</label>
+                        <select id="carModel" required>
+                            <option value="">-- Select Fleet Vehicle --</option>
+                            <option value="Toyota Land Cruiser V8">Toyota Land Cruiser V8</option>
+                            <option value="Toyota Prado">Toyota Prado</option>
+                            <option value="Subaru Forester e-BOXER">Subaru Forester e-BOXER</option>
+                            <option value="Mazda CX-5">Mazda CX-5</option>
+                            <option value="Toyota Vellfire">Toyota Vellfire</option>
+                            <option value="Nissan Elgrand">Nissan Elgrand</option>
+                            <option value="Toyota Probox">Toyota Probox</option>
+                        </select>
+                    </div>
                     <div class="form-group"><label for="carColor">Color</label><input type="text" id="carColor" required placeholder="e.g., Silver"></div>
-                    <div class="form-group"><label for="numberPlate">Number Plate</label><input type="text" id="numberPlate" required placeholder="e.g., KBC 123A"></div>
+                    <div class="form-group"><label for="numberPlate">Number Plate</label><input type="text" id="numberPlate" required placeholder="e.g., KBC 123A" style="text-transform: uppercase;"></div>
                     <div class="form-group"><label for="currentMileage">Current Mileage (km)</label><input type="number" id="currentMileage" required placeholder="e.g., 85000"></div>
                 </div>
 
@@ -216,8 +229,15 @@
         // AUTHENTICATION LOGIC (The Gatekeeper)
         // =========================================
         
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
+        // Forced Session Reset on load to stop auto login bypass
+        onAuthStateChanged(auth, async (user) => {
+            if (user && loginSection.style.display !== 'none') {
+                // An active saved session was caught on cold load, purge it
+                await signOut(auth);
+                loginSection.style.display = 'flex';
+                mainAppSection.style.display = 'none';
+            } else if (user) {
+                // Normal operational runtime transition
                 loginSection.style.display = 'none';
                 mainAppSection.style.display = 'block';
             } else {
@@ -241,7 +261,10 @@
             const password = document.getElementById('password').value;
 
             try {
+                // Setting UI displays straight inside the response stream manually to prevent flicker
                 await signInWithEmailAndPassword(auth, email, password);
+                loginSection.style.display = 'none';
+                mainAppSection.style.display = 'block';
             } catch (error) {
                 console.error("Login Failed:", error.message);
                 errorMsg.textContent = "Invalid email or password.";
@@ -314,10 +337,10 @@
                     clientEmail: document.getElementById('clientEmail').value,
                     carModel: document.getElementById('carModel').value,
                     carColor: document.getElementById('carColor').value,
-                    numberPlate: document.getElementById('numberPlate').value,
+                    numberPlate: document.getElementById('numberPlate').value.toUpperCase(),
                     currentMileage: Number(document.getElementById('currentMileage').value),
                     areaOfUsage: document.getElementById('areaOfUsage').value,
-                    description: document.getElementById('description').value || "", // Submits empty string if left blank
+                    description: document.getElementById('description').value || "",
                     dateTaken: document.getElementById('dateTaken').value,
                     timeTaken: document.getElementById('timeTaken').value,
                     daysTaken: Number(document.getElementById('daysTaken').value),
@@ -325,17 +348,23 @@
                     ratePerDay: Number(document.getElementById('ratePerDay').value),
                     amountPaid: Number(document.getElementById('amountPaid').value),
                     arrearsRemaining: Number(document.getElementById('arrearsRemaining').value),
-                    createdAt: new Date().toISOString()
+                    status: "Ongoing",
+                    createdAt: new Date().toISOString(),
+                    paymentHistory: [
+                        { date: document.getElementById('dateTaken').value, amount: Number(document.getElementById('amountPaid').value) }
+                    ]
                 };
 
                 await addDoc(collection(db, "rentals"), rentalData);
 
                 alert("Rental record saved successfully to Firebase!");
                 rentalForm.reset();
+                arrearsRemainingInput.value = '';
+                returnDateInput.value = '';
                 
             } catch (error) {
                 console.error("Error adding document: ", error);
-                alert("Error saving record. Make sure your Firestore database is in 'Test Mode'.");
+                alert("Error saving record. Check internet or server connectivity rules.");
             } finally {
                 submitBtn.textContent = "Save Rental Record";
                 submitBtn.disabled = false;
